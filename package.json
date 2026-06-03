@@ -86,7 +86,12 @@
   "build": {
     "appId": "dev.firekit.app",
     "productName": "FireKit",
-    "publish": null,
+    "publish": {
+      "provider": "github",
+      "owner": "Muneersahel",
+      "repo": "FireKit",
+      "releaseType": "release"
+    },
     "icon": "build/icon.png",
     "directories": {
       "output": "release",
