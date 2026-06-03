@@ -1,0 +1,1176 @@
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme) important;
+@import "tailwindcss/preflight.css" layer(base) important;
+@import "tailwindcss/utilities.css" important;
+@import "@spartan-ng/brain/hlm-tailwind-preset.css";
+
+:root {
+  color-scheme: dark;
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --radius: 0.625rem;
+  --background: oklch(0.141 0.005 285.823);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.21 0.006 285.885);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.21 0.006 285.885);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.7 0.18 45);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.274 0.006 286.033);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.274 0.006 286.033);
+  --muted-foreground: oklch(0.705 0.015 286.067);
+  --accent: oklch(0.274 0.006 286.033);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.552 0.016 285.938);
+  --sidebar: oklch(0.18 0.006 285.885);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.7 0.18 45);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.274 0.006 286.033);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.552 0.016 285.938);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground min-h-screen font-sans text-sm antialiased;
+  }
+
+  /* Pointer cursor on interactive controls app-wide */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="tab"],
+  [role="option"],
+  [role="menuitem"],
+  [role="menuitemradio"],
+  [role="menuitemcheckbox"],
+  [role="radio"],
+  [role="checkbox"],
+  select:not(:disabled),
+  summary,
+  a[href],
+  label[for],
+  hlm-select-trigger,
+  hlm-select-item,
+  [data-slot="select-trigger"],
+  [data-slot="select-item"],
+  .fk-doc-drawer__tab,
+  .fk-fs-doc-field__branch-toggle,
+  tr.fk-fs-data-row,
+  .fk-fs-data-row {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  select:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  /* Electron shell: frameless title bar + sidebar */
+  .fk-shell {
+    @apply bg-background;
+  }
+
+  .fk-shell__body {
+    @apply min-h-0 w-full;
+  }
+
+  .fk-shell .group\/sidebar-wrapper {
+    min-height: 0 !important;
+    height: 100%;
+  }
+
+  .fk-app-sidebar [data-sidebar="sidebar"] {
+    @apply flex flex-col pt-0;
+  }
+
+  /* Expanded: horizontal title bar with traffic lights + history */
+  .fk-sidebar-chrome-slot {
+    @apply shrink-0;
+  }
+
+  .group[data-collapsible="icon"] .fk-sidebar-chrome-slot {
+    @apply hidden;
+  }
+
+  /* Collapsed: vertical rail — toggle, then nav icons, then project */
+  .fk-sidebar-rail {
+    @apply hidden shrink-0 flex-col items-center border-b border-transparent px-1 py-2;
+  }
+
+  .group[data-collapsible="icon"] .fk-sidebar-rail {
+    @apply flex;
+  }
+
+  .fk-sidebar-rail__traffic-gap {
+    width: 100%;
+    height: 2.75rem;
+    flex-shrink: 0;
+    -webkit-app-region: drag;
+  }
+
+  .fk-sidebar-rail__btn {
+    @apply text-muted-foreground hover:text-foreground;
+  }
+
+  .fk-sidebar-chrome {
+    @apply border-sidebar-border flex h-10 shrink-0 items-center gap-1 border-b px-2;
+    -webkit-app-region: drag;
+  }
+
+  .fk-sidebar-chrome--mac .fk-sidebar-chrome__traffic-spacer {
+    width: 4.5rem;
+    flex-shrink: 0;
+    align-self: stretch;
+    -webkit-app-region: no-drag;
+  }
+
+  .fk-sidebar-chrome--custom-traffic {
+    @apply gap-2 pl-2;
+  }
+
+  .fk-sidebar-chrome__traffic {
+    @apply flex shrink-0 items-center gap-2;
+    -webkit-app-region: no-drag;
+  }
+
+  .fk-sidebar-chrome__traffic-btn {
+    @apply size-3 shrink-0 rounded-full border-0 transition-opacity hover:opacity-90;
+  }
+
+  .fk-sidebar-chrome__traffic-btn--close {
+    background: #ff5f57;
+  }
+
+  .fk-sidebar-chrome__traffic-btn--minimize {
+    background: #febc2e;
+  }
+
+  .fk-sidebar-chrome__traffic-btn--maximize {
+    background: #28c840;
+  }
+
+  .fk-sidebar-chrome__tools {
+    @apply flex shrink-0 items-center gap-0.5;
+    -webkit-app-region: no-drag;
+  }
+
+  .fk-sidebar-chrome__nav {
+    @apply flex items-center gap-0.5;
+  }
+
+  .fk-sidebar-chrome__icon-btn {
+    @apply text-muted-foreground hover:text-foreground size-7 shrink-0;
+    -webkit-app-region: no-drag;
+  }
+
+  .fk-sidebar-chrome__icon-btn:disabled {
+    @apply text-muted-foreground/35 hover:text-muted-foreground/35;
+  }
+
+  .fk-sidebar-chrome__drag {
+    @apply min-w-0 flex-1 self-stretch;
+  }
+
+  .group[data-collapsible="icon"] .fk-app-sidebar__header {
+    @apply hidden;
+  }
+
+  .fk-app-sidebar__header {
+    @apply border-sidebar-border border-b px-3 py-2.5;
+  }
+
+  .fk-app-sidebar__brand {
+    @apply flex items-center gap-2.5;
+  }
+
+  .group[data-collapsible="icon"] .fk-app-sidebar__content {
+    @apply flex flex-1 flex-col items-center gap-1 px-1 py-2;
+  }
+
+  .group[data-collapsible="icon"] .fk-app-sidebar__nav-group {
+    @apply w-full;
+  }
+
+  .group[data-collapsible="icon"] .fk-app-sidebar__group-label {
+    @apply hidden;
+  }
+
+  .group[data-collapsible="icon"] .fk-app-sidebar__menu {
+    @apply flex w-full flex-col items-center gap-1;
+  }
+
+  .group[data-collapsible="icon"]
+    .fk-app-sidebar__menu
+    [data-sidebar="menu-button"] {
+    @apply size-9 justify-center p-0;
+  }
+
+  .fk-app-sidebar__logo {
+    @apply size-8 shrink-0 rounded-lg object-cover;
+  }
+
+  .fk-app-sidebar__title {
+    @apply text-sidebar-foreground truncate text-sm font-semibold leading-tight;
+  }
+
+  .fk-app-sidebar__subtitle {
+    @apply text-muted-foreground truncate text-[11px] leading-tight;
+  }
+
+  .fk-app-sidebar__content {
+    @apply px-2 py-3;
+  }
+
+  .fk-app-sidebar__group-label {
+    @apply text-muted-foreground mb-1 px-2 text-[10px] font-semibold tracking-widest uppercase;
+  }
+
+  .fk-app-sidebar__footer {
+    @apply border-sidebar-border bg-sidebar/80 relative z-10 mt-auto overflow-visible border-t px-3 py-3;
+  }
+
+  .group[data-collapsible="icon"] .fk-app-sidebar__footer {
+    @apply flex justify-center overflow-visible border-t px-1 py-2;
+  }
+
+  .fk-app-sidebar [data-sidebar="sidebar"] {
+    overflow: visible;
+  }
+
+  .fk-app-sidebar__footer-expanded {
+    @apply block w-full;
+  }
+
+  .group[data-collapsible="icon"] .fk-app-sidebar__footer-expanded {
+    @apply hidden;
+  }
+
+  .fk-app-sidebar__footer-collapsed {
+    @apply hidden w-full;
+  }
+
+  .group[data-collapsible="icon"] .fk-app-sidebar__footer-collapsed {
+    @apply flex justify-center;
+  }
+
+  .fk-project-menu__icon {
+    @apply hover:bg-sidebar-accent;
+  }
+
+  .fk-project-menu__badge {
+    @apply bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-md text-[10px] font-bold tracking-tight;
+  }
+
+  .fk-project-menu__trigger {
+    @apply bg-sidebar-accent/40 border-sidebar-border h-8;
+  }
+
+  /* Opens upward so footer menu stays on screen */
+  .fk-project-menu__panel {
+    @apply bg-popover text-popover-foreground border-border absolute right-0 bottom-[calc(100%+6px)] left-0 z-[90] flex max-h-[min(16rem,50vh)] flex-col rounded-lg border p-2 shadow-lg;
+  }
+
+  .fk-project-menu__panel--compact {
+    @apply right-auto bottom-0 left-[calc(100%+6px)] w-56 max-h-[min(18rem,60vh)];
+  }
+
+  .fk-project-menu__title {
+    @apply text-muted-foreground mb-1.5 shrink-0 px-2 text-[10px] font-semibold tracking-widest uppercase;
+  }
+
+  .fk-project-menu__list {
+    @apply min-h-0 flex-1 space-y-0.5 overflow-auto;
+  }
+
+  .fk-project-menu__item {
+    @apply hover:bg-sidebar-accent flex w-full flex-col items-start gap-0.5 rounded-md px-2 py-2 text-left text-sm transition-colors;
+  }
+
+  .fk-project-menu__item--active {
+    @apply bg-sidebar-accent text-sidebar-accent-foreground;
+  }
+
+  .fk-project-menu__add {
+    @apply shrink-0;
+  }
+
+  .fk-sidebar-toggle {
+    @apply text-muted-foreground hover:text-foreground;
+  }
+
+  .fk-app-sidebar__select {
+    @apply w-full;
+  }
+
+  .fk-app-sidebar__add {
+    @apply gap-1.5;
+  }
+
+  /* First-run onboarding (full viewport, no sidebar) */
+  .fk-onboarding {
+    @apply bg-background flex min-h-svh flex-col;
+  }
+
+  .fk-onboarding-chrome {
+    @apply border-border flex h-10 shrink-0 items-center border-b px-3;
+    -webkit-app-region: drag;
+  }
+
+  .fk-onboarding-chrome--mac .fk-onboarding-chrome__traffic-spacer {
+    width: 4.75rem;
+    flex-shrink: 0;
+    align-self: stretch;
+    -webkit-app-region: no-drag;
+  }
+
+  .fk-onboarding-chrome--custom-traffic {
+    @apply gap-2 pl-2;
+  }
+
+  .fk-onboarding-chrome__traffic {
+    @apply flex shrink-0 items-center gap-2;
+    -webkit-app-region: no-drag;
+  }
+
+  .fk-onboarding-chrome__traffic-btn {
+    @apply size-3 shrink-0 rounded-full border-0 transition-opacity hover:opacity-90;
+  }
+
+  .fk-onboarding-chrome__traffic-btn--close {
+    background: #ff5f57;
+  }
+
+  .fk-onboarding-chrome__traffic-btn--minimize {
+    background: #febc2e;
+  }
+
+  .fk-onboarding-chrome__traffic-btn--maximize {
+    background: #28c840;
+  }
+
+  .fk-onboarding-chrome__drag {
+    @apply min-w-0 flex-1 self-stretch;
+  }
+
+  .fk-onboarding__grid {
+    @apply grid min-h-0 flex-1 lg:grid-cols-[minmax(280px,2fr)_minmax(360px,3fr)];
+  }
+
+  .fk-onboarding__hero {
+    @apply border-border relative hidden overflow-hidden border-r lg:flex;
+    background:
+      radial-gradient(
+        ellipse 80% 60% at 20% 20%,
+        oklch(0.7 0.18 45 / 12%),
+        transparent 55%
+      ),
+      oklch(0.16 0.006 285.885);
+  }
+
+  .fk-onboarding__hero-inner {
+    @apply flex h-full flex-col justify-center px-10 py-12;
+  }
+
+  .fk-onboarding__logo {
+    @apply mb-8 size-11 shrink-0 rounded-xl object-cover;
+  }
+
+  .fk-onboarding__eyebrow {
+    @apply text-primary mb-2 text-xs font-semibold tracking-widest uppercase;
+  }
+
+  .fk-onboarding__headline {
+    @apply text-2xl font-semibold tracking-tight text-balance sm:text-3xl;
+  }
+
+  .fk-onboarding__lead {
+    @apply text-muted-foreground mt-3 max-w-md text-sm leading-relaxed;
+  }
+
+  .fk-onboarding__steps {
+    @apply mt-10 space-y-3;
+  }
+
+  .fk-onboarding__step {
+    @apply text-muted-foreground flex items-center gap-3 text-sm;
+  }
+
+  .fk-onboarding__step--active {
+    @apply text-foreground font-medium;
+  }
+
+  .fk-onboarding__step-num {
+    @apply border-border bg-background/60 flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold;
+  }
+
+  .fk-onboarding__step--active .fk-onboarding__step-num {
+    @apply bg-primary text-primary-foreground border-primary;
+  }
+
+  .fk-onboarding__features {
+    @apply text-muted-foreground mt-10 space-y-3 text-sm;
+  }
+
+  .fk-onboarding__features li {
+    @apply flex items-center gap-2.5;
+  }
+
+  .fk-onboarding__main {
+    @apply flex min-h-0 flex-1 items-center justify-center overflow-auto p-6 sm:p-10;
+  }
+
+  .fk-onboarding__panel {
+    @apply border-border bg-card/60 w-full max-w-lg rounded-xl border p-6 shadow-sm backdrop-blur-sm sm:p-8;
+  }
+
+  .fk-onboarding__panel-header {
+    @apply mb-6;
+  }
+
+  .fk-connect-form__drop {
+    @apply border-border bg-muted/15 hover:border-primary/40 hover:bg-muted/25 flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed px-4 py-8 text-center transition-colors;
+  }
+
+  .fk-connect-form__drop--active {
+    @apply border-primary bg-primary/5;
+  }
+
+  .fk-connect-form__drop--filled {
+    @apply border-solid py-5;
+  }
+
+  .fk-connect-form__json {
+    @apply min-h-48 max-h-58 w-full resize-y overflow-y-auto field-sizing-fixed!;
+  }
+
+  .fk-connect-form__help-trigger {
+    @apply border-border bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground inline-flex size-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold leading-none transition-colors;
+    -webkit-app-region: no-drag;
+  }
+
+  .fk-connect-form__help {
+    @apply text-xs leading-relaxed;
+  }
+
+  .fk-connect-form__notice {
+    @apply border-border bg-muted/20 flex gap-2.5 rounded-lg border px-3 py-2.5;
+  }
+
+  .fk-connect-form__feedback {
+    @apply flex items-start gap-2;
+  }
+
+  .fk-search-input-wrap input {
+    -webkit-app-region: no-drag;
+  }
+
+  .fk-search-input-clear {
+    @apply text-muted-foreground hover:text-foreground hover:bg-muted absolute top-1/2 right-1.5 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-lg leading-none transition-colors;
+    -webkit-app-region: no-drag;
+  }
+
+  .fk-search-input-clear span {
+    @apply block -translate-y-px;
+  }
+
+  .fk-fs-breadcrumb {
+    @apply flex flex-wrap items-center gap-1 font-mono text-xs;
+  }
+
+  .fk-fs-breadcrumb__root {
+    @apply text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 transition-colors;
+  }
+
+  .fk-fs-breadcrumb__sep {
+    @apply text-muted-foreground/50 size-3.5 shrink-0;
+  }
+
+  .fk-fs-breadcrumb__link {
+    @apply text-primary hover:bg-primary/10 rounded-md px-1.5 py-0.5 transition-colors;
+  }
+
+  .fk-fs-breadcrumb__link--doc {
+    @apply text-muted-foreground hover:text-foreground;
+  }
+
+  .fk-fs-breadcrumb__current {
+    @apply bg-muted/50 text-foreground rounded-md px-1.5 py-0.5 font-semibold;
+  }
+
+  .fk-fs-breadcrumb__current--doc {
+    @apply text-primary bg-primary/10;
+  }
+
+  .fk-doc-page {
+    @apply bg-background flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden;
+  }
+
+  .fk-doc-page__toolbar {
+    @apply border-border bg-card/40 flex shrink-0 flex-wrap items-center gap-3 border-b px-4 py-3 sm:px-5;
+  }
+
+  .fk-doc-page__back {
+    @apply text-muted-foreground hover:text-foreground -ml-1 shrink-0 gap-1.5 px-2;
+  }
+
+  .fk-doc-page__back-icon {
+    @apply text-base leading-none;
+  }
+
+  .fk-doc-page__identity {
+    @apply flex min-w-0 flex-1 items-center gap-2;
+  }
+
+  .fk-doc-page__title {
+    @apply min-w-0 truncate font-mono text-lg font-semibold tracking-tight sm:text-xl;
+  }
+
+  .fk-doc-page__badge {
+    @apply bg-primary/15 text-primary shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase;
+  }
+
+  .fk-doc-page__actions {
+    @apply flex shrink-0 flex-wrap items-center gap-2;
+  }
+
+  .fk-doc-page__layout {
+    @apply flex min-h-0 min-w-0 flex-1 overflow-hidden;
+  }
+
+  /* Match collections sidebar: full-height column, scrollable inner body */
+  .fk-doc-page__rail {
+    @apply border-border bg-muted/10 hidden min-h-0 w-56 shrink-0 flex-col border-r md:flex lg:w-64;
+  }
+
+  .fk-doc-page__rail-scroll {
+    @apply min-h-0 flex-1 overflow-y-auto overscroll-contain;
+  }
+
+  .fk-doc-page__rail-block {
+    @apply space-y-2 px-4 py-4;
+  }
+
+  .fk-doc-page__rail-block + .fk-doc-page__rail-block {
+    @apply border-border border-t;
+  }
+
+  .fk-doc-page__rail-label {
+    @apply text-muted-foreground text-[10px] font-semibold tracking-widest uppercase;
+  }
+
+  .fk-doc-page__stats {
+    @apply pt-0;
+  }
+
+  .fk-doc-page__meta {
+    @apply border-border/80 bg-muted/30 min-w-0 rounded-lg border px-3 py-2.5;
+  }
+
+  .fk-doc-page__meta .fk-doc-drawer__meta-row {
+    @apply flex min-w-0 items-center gap-2;
+  }
+
+  .fk-doc-page__meta .fk-doc-drawer__meta-row dt {
+    @apply w-[4.5rem] shrink-0;
+  }
+
+  .fk-doc-page__meta .fk-doc-drawer__meta-row dd {
+    @apply min-w-0 flex-1 truncate whitespace-nowrap;
+  }
+
+  .fk-doc-page__rail .fk-doc-drawer__subcols {
+    @apply border-0 pt-0;
+  }
+
+  .fk-doc-page__workspace {
+    @apply bg-background flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden;
+  }
+
+  .fk-doc-workspace {
+    @apply flex min-h-0 flex-1 flex-col overflow-hidden;
+  }
+
+  .fk-doc-workspace--page {
+    @apply bg-background flex min-h-0 flex-1 flex-col;
+  }
+
+  .fk-doc-page__tabs {
+    @apply border-border bg-muted/20 shrink-0 border-b px-4 sm:px-5;
+  }
+
+  .fk-doc-page__scroll {
+    @apply bg-background min-h-0 flex-1 overflow-auto px-4 py-5 sm:px-6 sm:py-6;
+  }
+
+  .fk-doc-page__field-list {
+    @apply grid gap-3 sm:grid-cols-2 xl:grid-cols-3;
+  }
+
+  .fk-doc-page__field-list > .fk-fs-doc-field:has(.fk-fs-doc-field__branch) {
+    grid-column: 1 / -1;
+  }
+
+  .fk-doc-page__field-list .fk-fs-doc-field {
+    @apply bg-card/80 h-full;
+  }
+
+  .fk-doc-page__json-editor {
+    @apply min-h-[min(32rem,60vh)];
+  }
+
+  .fk-subcollections-menu {
+    @apply bg-popover text-popover-foreground border-border absolute top-full right-0 z-50 mt-1 min-w-[8rem] rounded-md border py-1 shadow-lg;
+  }
+
+  .fk-subcollections-menu__item {
+    @apply hover:bg-sidebar-accent block w-full px-3 py-1.5 text-left font-mono text-xs;
+  }
+
+  .fk-subcollections-btn {
+    @apply text-muted-foreground hover:text-foreground;
+  }
+
+  /* Routed views are siblings after router-outlet; do not flex-grow the outlet itself */
+  .fk-main {
+    @apply relative flex min-h-0 flex-1 flex-col overflow-hidden;
+  }
+
+  .fk-main > router-outlet + * {
+    @apply flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden;
+  }
+
+  /* Firestore nested outlet (collection / document under shell) */
+  fk-firestore-shell > .fk-main > router-outlet + * {
+    @apply flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden;
+  }
+
+  /* Auth users table: fixed header + scrollable body (reliable vs position:sticky) */
+  .fk-auth-table-panel {
+    @apply border-border flex min-h-0 flex-1 flex-col overflow-hidden border;
+  }
+
+  .fk-auth-table-header {
+    @apply bg-muted/40 shrink-0;
+  }
+
+  .fk-auth-table-scroll {
+    @apply min-h-0 flex-1 overflow-auto overscroll-contain;
+  }
+
+  .fk-auth-table {
+    @apply w-full table-fixed border-separate border-spacing-0;
+  }
+
+  .fk-auth-table tr {
+    @apply border-0;
+  }
+
+  .fk-auth-table .fk-auth-cell {
+    @apply border-border border-r border-b px-3 py-2.5 align-middle;
+  }
+
+  .fk-auth-table .fk-auth-cell:last-child {
+    @apply border-r-0;
+  }
+
+  .fk-auth-table .fk-auth-th {
+    @apply bg-muted/40 text-muted-foreground border-b-2 px-3 py-2.5 text-[11px] font-semibold tracking-widest uppercase;
+  }
+
+  .fk-auth-table-scroll .fk-auth-table tbody tr:last-child .fk-auth-cell {
+    @apply border-b-0;
+  }
+
+  .fk-auth-table-scroll .fk-auth-table tbody tr:hover .fk-auth-cell {
+    @apply bg-muted/25;
+  }
+
+  .fk-auth-table-scroll
+    .fk-auth-table
+    tbody
+    tr.fk-auth-row-selected
+    .fk-auth-cell {
+    @apply bg-primary/10;
+  }
+
+  .fk-auth-skeleton-row .fk-auth-cell {
+    @apply py-3;
+  }
+
+  .fk-auth-table-loading {
+    @apply absolute inset-0 z-10 flex items-center justify-center bg-background/55 backdrop-blur-[2px];
+  }
+
+  /* Firestore fields table: one table, header + body scroll together horizontally */
+  .fk-fs-fields-scroll {
+    @apply min-h-0 flex-1 overflow-auto overscroll-contain;
+  }
+
+  .fk-fs-fields-table {
+    @apply table-fixed border-separate border-spacing-0;
+  }
+
+  .fk-fs-fields-table .fk-auth-th,
+  .fk-fs-fields-table .fk-fs-field-header {
+    @apply bg-muted text-foreground sticky top-0 z-20 border-b-2 px-3 py-2.5 text-xs font-medium normal-case tracking-normal;
+  }
+
+  .fk-fs-fields-table .fk-fs-sticky-col {
+    @apply bg-card sticky left-0 z-10;
+    box-shadow: 4px 0 10px -6px rgb(0 0 0 / 45%);
+  }
+
+  .fk-fs-fields-table thead .fk-fs-sticky-col {
+    @apply bg-muted z-30;
+  }
+
+  .fk-fs-fields-table tbody tr.fk-fs-data-row:hover td {
+    @apply bg-muted;
+  }
+
+  .fk-fs-fields-table tbody tr.fk-fs-data-row:hover .fk-fs-sticky-col {
+    @apply bg-muted;
+  }
+
+  .fk-fs-fields-table tbody tr.fk-auth-row-selected td {
+    @apply bg-accent;
+  }
+
+  .fk-fs-fields-table tbody tr.fk-auth-row-selected .fk-fs-sticky-col {
+    @apply bg-accent;
+  }
+
+  .fk-fs-fields-table tbody tr:last-child .fk-auth-cell {
+    @apply border-b-0;
+  }
+
+  /* Document drawer */
+  .fk-doc-drawer__backdrop {
+    @apply bg-background/80 backdrop-blur-sm;
+  }
+
+  .fk-doc-drawer__panel {
+    @apply bg-card border-border flex h-full w-full max-w-2xl flex-col border-l shadow-2xl;
+  }
+
+  .fk-doc-drawer__header {
+    @apply border-border shrink-0 space-y-3 border-b px-5 py-4;
+  }
+
+  .fk-doc-drawer__eyebrow {
+    @apply text-muted-foreground text-[11px] font-medium tracking-wide;
+  }
+
+  .fk-doc-drawer__title {
+    @apply mt-0.5 truncate font-mono text-lg font-semibold tracking-tight;
+  }
+
+  .fk-doc-drawer__path {
+    @apply text-muted-foreground mt-1 truncate font-mono text-xs;
+  }
+
+  .fk-doc-drawer__subcols {
+    @apply border-border space-y-2 border-t pt-3;
+  }
+
+  .fk-doc-drawer__subcols-label {
+    @apply text-muted-foreground text-[10px] font-semibold tracking-widest uppercase;
+  }
+
+  .fk-doc-drawer__subcols-list {
+    @apply flex flex-wrap gap-1.5;
+  }
+
+  .fk-doc-drawer__stats {
+    @apply flex flex-wrap items-center gap-2 pt-1;
+  }
+
+  .fk-doc-drawer__stat {
+    @apply text-muted-foreground text-xs;
+  }
+
+  .fk-doc-drawer__stat-value {
+    @apply text-foreground mr-1 font-semibold;
+  }
+
+  .fk-doc-drawer__meta {
+    @apply grid gap-1.5 rounded-lg border border-border/80 bg-muted/30 px-3 py-2.5 text-xs;
+  }
+
+  .fk-doc-drawer__meta-row {
+    @apply grid grid-cols-[4.5rem_1fr] gap-2;
+  }
+
+  .fk-doc-drawer__meta-row dt {
+    @apply text-muted-foreground font-medium;
+  }
+
+  .fk-doc-drawer__meta-row dd {
+    @apply font-mono tabular-nums;
+  }
+
+  .fk-doc-drawer__tabs {
+    @apply border-border flex shrink-0 gap-1 border-b px-5 py-2;
+  }
+
+  .fk-doc-drawer__tab {
+    @apply text-muted-foreground rounded-md px-3 py-1.5 text-xs font-medium transition-colors;
+  }
+
+  .fk-doc-drawer__tab:hover {
+    @apply bg-muted/50 text-foreground;
+  }
+
+  .fk-doc-drawer__tab--active {
+    @apply bg-muted text-foreground;
+  }
+
+  .fk-doc-drawer__body {
+    @apply px-5 py-4;
+  }
+
+  .fk-doc-drawer__loading {
+    @apply text-muted-foreground flex items-center justify-center gap-2 py-20 text-sm;
+  }
+
+  .fk-doc-drawer__field-list {
+    @apply flex flex-col gap-3;
+  }
+
+  .fk-doc-drawer__empty {
+    @apply border-border rounded-lg border border-dashed px-4 py-10 text-center;
+  }
+
+  .fk-doc-drawer__empty-title {
+    @apply mb-1 text-sm font-medium;
+  }
+
+  .fk-doc-new-fields {
+    @apply space-y-4;
+  }
+
+  .fk-doc-new-fields__intro {
+    @apply space-y-1;
+  }
+
+  .fk-doc-new-fields__title {
+    @apply text-sm font-medium;
+  }
+
+  .fk-doc-new-fields__hint {
+    @apply text-muted-foreground text-xs leading-relaxed;
+  }
+
+  .fk-doc-new-fields__rows {
+    @apply flex flex-col gap-3;
+  }
+
+  .fk-doc-new-fields__row {
+    @apply border-border space-y-3 rounded-lg border bg-muted/15 p-3.5;
+  }
+
+  .fk-doc-new-fields__row-grid {
+    @apply grid grid-cols-1 gap-3 sm:grid-cols-2;
+  }
+
+  .fk-doc-new-fields__field {
+    @apply space-y-1.5;
+  }
+
+  .fk-doc-new-fields__label {
+    @apply text-muted-foreground text-[11px] font-medium;
+  }
+
+  .fk-doc-new-fields__select {
+    @apply block w-full max-w-none;
+  }
+
+  .fk-doc-new-fields__field hlm-native-select {
+    @apply block w-full max-w-none;
+  }
+
+  .fk-doc-new-fields__json-input {
+    @apply min-h-[4.5rem] resize-y;
+  }
+
+  .fk-doc-new-fields__remove {
+    @apply text-muted-foreground hover:text-destructive -mb-1 h-8 px-2;
+  }
+
+  .fk-doc-new-fields__add {
+    @apply w-full sm:w-auto;
+  }
+
+  .fk-doc-new-fields__preview {
+    @apply border-border space-y-2 border-t pt-4;
+  }
+
+  .fk-doc-new-fields__preview-title {
+    @apply text-muted-foreground text-xs font-medium;
+  }
+
+  .fk-doc-drawer__json-editor {
+    @apply bg-muted/20 border-border min-h-[min(24rem,50vh)] w-full resize-y rounded-lg border;
+  }
+
+  .fk-doc-drawer__footer {
+    @apply border-border flex shrink-0 flex-wrap gap-2 border-t px-5 py-3;
+  }
+
+  /* Confirm delete dialog */
+  .fk-confirm-dialog {
+    @apply fixed inset-0 z-[60] flex items-center justify-center p-4;
+  }
+
+  .fk-confirm-dialog__backdrop {
+    @apply absolute inset-0 bg-background/85 backdrop-blur-sm;
+  }
+
+  .fk-confirm-dialog__panel {
+    @apply bg-card border-border relative z-10 w-full max-w-md space-y-4 rounded-xl border p-5 shadow-2xl;
+  }
+
+  .fk-confirm-dialog__title {
+    @apply text-base font-semibold tracking-tight;
+  }
+
+  .fk-confirm-dialog__message {
+    @apply text-muted-foreground text-sm leading-relaxed;
+  }
+
+  .fk-confirm-dialog__detail {
+    @apply bg-muted/40 text-muted-foreground rounded-md px-3 py-2 font-mono text-xs break-all;
+  }
+
+  .fk-confirm-dialog__actions {
+    @apply flex justify-end gap-2 pt-1;
+  }
+
+  /* Document field cards & value types */
+  .fk-fs-kind {
+    @apply inline-flex shrink-0 items-center rounded-md px-2 py-0.5 font-mono text-[10px] font-medium leading-none;
+  }
+
+  .fk-fs-kind--string {
+    @apply bg-sky-500/15 text-sky-300;
+  }
+
+  .fk-fs-kind--number {
+    @apply bg-amber-500/15 text-amber-200;
+  }
+
+  .fk-fs-kind--boolean {
+    @apply bg-emerald-500/15 text-emerald-300;
+  }
+
+  .fk-fs-kind--timestamp {
+    @apply bg-violet-500/15 text-violet-300;
+  }
+
+  .fk-fs-kind--array {
+    @apply bg-orange-500/15 text-orange-300;
+  }
+
+  .fk-fs-kind--object {
+    @apply bg-zinc-400/15 text-zinc-300;
+  }
+
+  .fk-fs-kind--null {
+    @apply bg-muted text-muted-foreground;
+  }
+
+  .fk-fs-doc-field {
+    @apply border-border overflow-hidden rounded-lg border bg-muted/15;
+  }
+
+  .fk-fs-doc-field__leaf {
+    @apply px-3.5 py-3;
+  }
+
+  .fk-fs-doc-field__leaf--embedded {
+    @apply px-0 py-0;
+  }
+
+  .fk-fs-doc-field__leaf--embedded .fk-fs-doc-field__value {
+    @apply text-sm;
+  }
+
+  .fk-fs-doc-field__leaf-head {
+    @apply mb-1.5 flex items-center justify-between gap-2;
+  }
+
+  .fk-fs-doc-field__key {
+    @apply min-w-0 truncate font-mono text-xs font-medium text-foreground;
+  }
+
+  .fk-fs-doc-field__value {
+    @apply m-0 break-all font-mono text-sm leading-relaxed text-foreground/95;
+  }
+
+  .fk-fs-doc-field__value--null {
+    @apply text-muted-foreground italic;
+  }
+
+  .fk-fs-doc-field__value--bool {
+    @apply font-semibold text-emerald-300;
+  }
+
+  .fk-fs-doc-field__value--number {
+    @apply tabular-nums text-amber-100/95;
+  }
+
+  .fk-fs-doc-field__branch-toggle {
+    @apply hover:bg-muted/40 flex w-full items-start justify-between gap-3 px-3.5 py-3 text-left transition-colors;
+  }
+
+  .fk-fs-doc-field__branch--embedded .fk-fs-doc-field__branch-toggle {
+    @apply px-0 py-2;
+  }
+
+  .fk-fs-doc-field__branch-toggle--compact {
+    @apply w-full justify-start py-1.5;
+  }
+
+  .fk-fs-doc-field__branch-meta--start {
+    @apply w-full justify-start;
+  }
+
+  .fk-fs-doc-field__branch-meta {
+    @apply flex shrink-0 flex-wrap items-center justify-end gap-1.5;
+  }
+
+  .fk-fs-doc-field__summary {
+    @apply text-muted-foreground max-w-[10rem] truncate font-mono text-[11px] sm:max-w-xs;
+  }
+
+  .fk-fs-doc-field__count {
+    @apply text-muted-foreground rounded bg-background/60 px-1.5 py-0.5 font-mono text-[10px];
+  }
+
+  .fk-fs-doc-field__chevron {
+    @apply text-muted-foreground w-4 text-center text-xs;
+  }
+
+  .fk-fs-doc-field__children {
+    @apply border-border border-t bg-background/20 px-3 py-3;
+  }
+
+  .fk-fs-doc-field__children--array {
+    @apply flex flex-col gap-2.5 border-t px-3 py-3;
+  }
+
+  .fk-fs-doc-field__children--object {
+    @apply flex flex-col gap-2.5 border-t px-3 py-3;
+  }
+
+  .fk-fs-array-item {
+    @apply border-border overflow-hidden rounded-md border bg-background/50;
+  }
+
+  .fk-fs-array-item__header {
+    @apply border-border bg-muted/30 flex items-center justify-between gap-2 border-b px-3 py-2;
+  }
+
+  .fk-fs-array-item__index {
+    @apply font-mono text-xs font-semibold text-orange-300/95;
+  }
+
+  .fk-fs-array-item__body {
+    @apply px-3 py-2.5;
+  }
+
+  .fk-fs-array-item__body .fk-fs-doc-field__value {
+    @apply m-0;
+  }
+
+  .fk-fs-object-prop {
+    @apply border-border overflow-hidden rounded-md border bg-background/40;
+  }
+
+  .fk-fs-object-prop > .fk-fs-doc-field__branch,
+  .fk-fs-object-prop > .fk-fs-doc-field__leaf {
+    @apply m-0;
+  }
+
+  .fk-fs-object-prop .fk-fs-doc-field__leaf {
+    @apply px-3 py-2.5;
+  }
+
+  .fk-fs-object-prop .fk-fs-doc-field__branch-toggle {
+    @apply px-3 py-2.5;
+  }
+
+  .fk-fs-object-prop .fk-fs-doc-field__children {
+    @apply mx-0 mb-0 border-t-0 bg-transparent px-2 pb-2 pt-0;
+  }
+
+  .fk-fs-object-prop .fk-fs-doc-field__children--object,
+  .fk-fs-object-prop .fk-fs-doc-field__children--array {
+    @apply gap-2 border-t px-2 pt-2;
+  }
+}
+
+/* Spartan components ship cursor-default on items; keep pointer for selectable UI */
+@layer utilities {
+  hlm-select-item:not([data-disabled]),
+  [data-slot="select-item"]:not([data-disabled]) {
+    cursor: pointer;
+  }
+
+  /* Select dropdown above document drawer overlay (z-50) */
+  hlm-select-content,
+  [data-slot="select-content"],
+  .cdk-overlay-pane:has(hlm-select-content) {
+    z-index: 80 !important;
+  }
+
+  /* Firestore collections sidebar — stale-while-revalidate list */
+  .fk-collection-list--refreshing {
+    transition: opacity 150ms ease;
+    opacity: 0.88;
+  }
+
+  .fk-collection-list__item {
+    overflow: hidden;
+  }
+
+  .fk-collection-enter {
+    animation: fk-collection-enter 160ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .fk-collection-leave {
+    animation: fk-collection-leave 120ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+
+  @keyframes fk-collection-enter {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fk-collection-leave {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+}
