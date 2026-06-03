@@ -1,0 +1,13 @@
+node_modules
+.cache
+dist
+dist-electron
+release
+.angular
+*.log
+.DS_Store
+.idea
+.vscode
+coverage
+*.db
+firebase-service-account*.json
