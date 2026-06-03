@@ -58,14 +58,30 @@ On first launch, use **Add project** and import your service account JSON. Crede
 
 ## Build for release
 
+**CI / local packages only** (no GitHub upload):
+
 ```bash
 pnpm run icons:generate   # once, or after changing public/firekit-icon.png
-pnpm run build
-pnpm run electron:build
 pnpm run dist
 ```
 
-Artifacts are produced per platform (macOS, Windows, Linux). Code signing is not configured in v1; see [docs/PROJECT.md](docs/PROJECT.md) roadmap.
+**Publish to GitHub Releases** — tag a version and push, or run the Release workflow manually:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+GitHub Actions builds on macOS, Windows, and Linux and uploads installers. The workflow uses `GITHUB_TOKEN` by default; add a repository secret **`GH_TOKEN`** (PAT with `repo` scope) only if you need a personal token instead.
+
+Local publish:
+
+```bash
+export GH_TOKEN="ghp_..."   # PAT with repo + contents access
+pnpm run dist:release
+```
+
+Code signing is not configured in v1; see [docs/PROJECT.md](docs/PROJECT.md) roadmap.
 
 ## Documentation
 
