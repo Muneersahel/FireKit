@@ -4,7 +4,10 @@
   "description": "Desktop admin for Firebase Firestore and Authentication",
   "private": true,
   "main": "dist-electron/electron/main.js",
-  "author": "FireKit contributors",
+  "author": {
+    "name": "Munir I Said",
+    "email": "saidmunir73@gmail.com"
+  },
   "license": "MIT",
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -117,6 +120,7 @@
       ]
     },
     "linux": {
+      "maintainer": "FireKit contributors <muneersahel@users.noreply.github.com>",
       "icon": "build/icons",
       "executableName": "firekit",
       "desktop": {
