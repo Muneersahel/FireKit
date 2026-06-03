@@ -9,6 +9,14 @@
     "email": "saidmunir73@gmail.com"
   },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Muneersahel/FireKit.git"
+  },
+  "homepage": "https://github.com/Muneersahel/FireKit#readme",
+  "bugs": {
+    "url": "https://github.com/Muneersahel/FireKit/issues"
+  },
   "pnpm": {
     "onlyBuiltDependencies": [
       "@firebase/util",
@@ -31,7 +39,8 @@
     "electron:dev": "pnpm run electron:build && concurrently -k \"ng serve\" \"wait-on http://localhost:4200 && node scripts/electron-dev.mjs\"",
     "electron:start": "node scripts/electron-dev.mjs",
     "icons:generate": "node scripts/generate-icons.mjs",
-    "dist": "pnpm run build && pnpm run electron:build && electron-builder",
+    "dist": "pnpm run build && pnpm run electron:build && electron-builder --publish never",
+    "dist:release": "pnpm run build && pnpm run electron:build && electron-builder --publish always",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
@@ -77,6 +86,7 @@
   "build": {
     "appId": "dev.firekit.app",
     "productName": "FireKit",
+    "publish": null,
     "icon": "build/icon.png",
     "directories": {
       "output": "release",
