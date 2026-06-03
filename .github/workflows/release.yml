@@ -44,11 +44,25 @@ jobs:
         env:
           CI: true
 
+      # Only ship installers — not win-unpacked / linux-unpacked (node_modules, etc.)
+      - name: Collect installers
+        shell: bash
+        run: |
+          mkdir -p upload
+          find release -maxdepth 1 -type f \( \
+            -iname '*.dmg' -o -iname '*.zip' -o -iname '*.AppImage' -o \
+            -iname '*.deb' -o -iname '*.exe' -o -iname '*.msi' -o -iname '*.blockmap' \
+            \) -exec cp {} upload/ \;
+          ls -la upload/
+          if [ -z "$(ls -A upload)" ]; then
+            echo "No installer files in release/:" && ls -la release/ && exit 1
+          fi
+
       - name: Upload platform artifacts
         uses: actions/upload-artifact@v4
         with:
           name: installers-${{ matrix.os }}
-          path: release/
+          path: upload/
           if-no-files-found: error
 
   publish:
@@ -71,8 +85,15 @@ jobs:
           name: ${{ github.event_name == 'push' && github.ref_name || github.event.inputs.tag }}
           draft: false
           prerelease: false
+          overwrite_files: true
           generate_release_notes: true
           files: |
-            artifacts/**/*
+            artifacts/**/*.dmg
+            artifacts/**/*.zip
+            artifacts/**/*.AppImage
+            artifacts/**/*.deb
+            artifacts/**/*.exe
+            artifacts/**/*.msi
+            artifacts/**/*.blockmap
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
