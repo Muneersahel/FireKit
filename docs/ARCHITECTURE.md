@@ -102,6 +102,8 @@ CREATE INDEX idx_search ON doc_index(project_id, collection_path);
 | Dev | `http://localhost:4200` (ng serve) |
 | Prod | `file://…/dist/firekit/browser/index.html` |
 
+Production Angular build uses `baseHref: "./"` and hash routing (`withHashLocation`) so assets and routes work under `file://` in Electron.
+
 Main/preload compiled to `dist-electron/` via `tsc -p electron/tsconfig.json`.
 
 ## Security defaults
