@@ -39,6 +39,7 @@ import { FirestoreValueCellComponent } from "./firestore-value-cell.component";
           class="fk-auth-table fk-fs-fields-table w-max min-w-full"
         >
           <colgroup>
+            <col [style.width.px]="selectColWidth" />
             <col [style.width.px]="docIdColWidth" />
             @for (field of displayFields(); track field) {
               <col [style.width.px]="columnWidth(field)" />
@@ -46,6 +47,24 @@ import { FirestoreValueCellComponent } from "./firestore-value-cell.component";
           </colgroup>
           <thead hlmTHead>
             <tr hlmTr>
+              <th
+                hlmTh
+                class="fk-auth-th fk-auth-cell fk-fs-select-col fk-fs-field-header text-center"
+              >
+                <input
+                  type="checkbox"
+                  class="fk-fs-row-select"
+                  [checked]="allPageMarked()"
+                  [disabled]="!documents().length || initialLoading()"
+                  [attr.aria-label]="
+                    allPageMarked()
+                      ? 'Clear delete marks on this page'
+                      : 'Mark all documents on this page for delete'
+                  "
+                  (click)="$event.stopPropagation()"
+                  (change)="toggleMarkAll.emit()"
+                />
+              </th>
               <th
                 hlmTh
                 class="fk-auth-th fk-auth-cell fk-fs-sticky-col fk-fs-field-header text-left"
@@ -68,6 +87,12 @@ import { FirestoreValueCellComponent } from "./firestore-value-cell.component";
             @if (initialLoading()) {
               @for (row of skeletonRows; track row) {
                 <tr hlmTr class="fk-auth-skeleton-row">
+                  <td hlmTd class="fk-auth-cell fk-fs-select-col">
+                    <div
+                      hlmSkeleton
+                      class="mx-auto h-3.5 w-3.5 rounded-sm"
+                    ></div>
+                  </td>
                   <td hlmTd class="fk-auth-cell fk-fs-sticky-col">
                     <div hlmSkeleton class="h-3 w-24"></div>
                   </td>
@@ -84,8 +109,22 @@ import { FirestoreValueCellComponent } from "./firestore-value-cell.component";
                   hlmTr
                   class="fk-fs-data-row cursor-pointer"
                   [class.fk-auth-row-selected]="highlightedDocId() === doc.id"
+                  [class.fk-fs-row-marked-delete]="isMarked(doc.path)"
                   (click)="openDocument.emit(doc.path)"
                 >
+                  <td
+                    hlmTd
+                    class="fk-auth-cell fk-fs-select-col align-middle text-center"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <input
+                      type="checkbox"
+                      class="fk-fs-row-select"
+                      [checked]="isMarked(doc.path)"
+                      [attr.aria-label]="'Mark ' + doc.id + ' for delete'"
+                      (change)="toggleMark.emit(doc.path)"
+                    />
+                  </td>
                   <td hlmTd class="fk-auth-cell fk-fs-sticky-col align-middle">
                     <span
                       class="block truncate font-mono text-xs font-medium"
@@ -126,10 +165,19 @@ export class FirestoreFieldsTableComponent {
   readonly initialLoading = input(false);
   readonly refreshing = input(false);
   readonly highlightedDocId = input<string | null>(null);
+  readonly markedPaths = input<ReadonlySet<string>>(new Set());
+  readonly allPageMarked = input(false);
 
   readonly openDocument = output<string>();
+  readonly toggleMark = output<string>();
+  readonly toggleMarkAll = output<void>();
 
+  protected readonly selectColWidth = 44;
   protected readonly docIdColWidth = 200;
+
+  isMarked(path: string): boolean {
+    return this.markedPaths().has(path);
+  }
   protected readonly skeletonRows = [0, 1, 2, 3, 4, 5, 6, 7];
   protected readonly skeletonCols = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 

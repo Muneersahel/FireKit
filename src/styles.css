@@ -725,13 +725,49 @@
     @apply bg-muted text-foreground sticky top-0 z-20 border-b-2 px-3 py-2.5 text-xs font-medium normal-case tracking-normal;
   }
 
+  .fk-fs-fields-table .fk-fs-select-col {
+    @apply bg-card w-11 min-w-11 max-w-11 px-1 text-center;
+    position: sticky;
+    left: 0;
+    z-index: 11;
+  }
+
+  .fk-fs-fields-table thead .fk-fs-select-col {
+    @apply bg-muted z-40;
+  }
+
   .fk-fs-fields-table .fk-fs-sticky-col {
-    @apply bg-card sticky left-0 z-10;
+    @apply bg-card sticky z-10;
+    left: 2.75rem;
     box-shadow: 4px 0 10px -6px rgb(0 0 0 / 45%);
   }
 
   .fk-fs-fields-table thead .fk-fs-sticky-col {
     @apply bg-muted z-30;
+  }
+
+  .fk-fs-row-select {
+    @apply accent-destructive size-3.5 cursor-pointer;
+  }
+
+  .fk-fs-fields-table tbody tr.fk-fs-row-marked-delete td,
+  .fk-fs-fields-table tbody tr.fk-fs-row-marked-delete .fk-fs-sticky-col,
+  .fk-fs-fields-table tbody tr.fk-fs-row-marked-delete .fk-fs-select-col {
+    @apply bg-destructive/10;
+  }
+
+  .fk-fs-fields-table tbody tr.fk-fs-row-marked-delete:hover td,
+  .fk-fs-fields-table tbody tr.fk-fs-row-marked-delete:hover .fk-fs-sticky-col,
+  .fk-fs-fields-table tbody tr.fk-fs-row-marked-delete:hover .fk-fs-select-col {
+    @apply bg-destructive/15;
+  }
+
+  .fk-auth-table-scroll tbody tr.fk-fs-row-marked-delete .fk-auth-cell {
+    @apply bg-destructive/10;
+  }
+
+  .fk-auth-table-scroll tbody tr.fk-fs-row-marked-delete:hover .fk-auth-cell {
+    @apply bg-destructive/15;
   }
 
   .fk-fs-fields-table tbody tr.fk-fs-data-row:hover td {

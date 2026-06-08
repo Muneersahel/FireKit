@@ -29,6 +29,7 @@ import { HlmTableImports } from "@spartan-ng/helm/table";
 import { ElectronApiService } from "../../core/electron-api.service";
 import { createFirestoreDocumentId } from "../../core/firestore-document-id";
 import { ProjectContextService } from "../../core/project-context.service";
+import { DeleteConfirmDialogComponent } from "./delete-confirm-dialog.component";
 import { FirestoreFieldsTableComponent } from "./firestore-fields-table.component";
 import { FirestoreNavService } from "./firestore-nav.service";
 import { documentIdFromPath } from "./firestore-path.utils";
@@ -55,6 +56,7 @@ const SKELETON_DOC_ROWS = 80;
     HlmSpinnerImports,
     HlmSkeletonImports,
     FirestoreFieldsTableComponent,
+    DeleteConfirmDialogComponent,
   ],
   template: `
     <section
@@ -166,6 +168,37 @@ const SKELETON_DOC_ROWS = 80;
                     List
                   </button>
                 </div>
+                @if (documents().length && !initialLoadingDocs()) {
+                  <button
+                    hlmBtn
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    (click)="markAllOnPageForDelete()"
+                  >
+                    Mark all
+                  </button>
+                  @if (markedCount() > 0) {
+                    <button
+                      hlmBtn
+                      variant="ghost"
+                      size="sm"
+                      type="button"
+                      (click)="clearMarkedForDelete()"
+                    >
+                      Clear marks
+                    </button>
+                    <button
+                      hlmBtn
+                      variant="destructive"
+                      size="sm"
+                      type="button"
+                      (click)="openBulkDeleteDialog()"
+                    >
+                      Delete {{ markedCount() }}
+                    </button>
+                  }
+                }
                 <button hlmBtn size="sm" type="button" (click)="createDoc()">
                   New document
                 </button>
@@ -491,7 +524,11 @@ const SKELETON_DOC_ROWS = 80;
                   [initialLoading]="initialLoadingDocs()"
                   [refreshing]="refreshingDocs()"
                   [highlightedDocId]="highlightedDocId()"
+                  [markedPaths]="markedForDelete()"
+                  [allPageMarked]="allPageMarkedForDelete()"
                   (openDocument)="openDocument($event)"
+                  (toggleMark)="toggleMarkForDelete($event)"
+                  (toggleMarkAll)="toggleMarkAllOnPageForDelete()"
                 />
               } @else {
                 <div
@@ -511,11 +548,29 @@ const SKELETON_DOC_ROWS = 80;
                   <div class="fk-auth-table-header">
                     <table hlmTable class="fk-auth-table">
                       <colgroup>
-                        <col style="width: 32%" />
-                        <col style="width: 68%" />
+                        <col style="width: 44px" />
+                        <col style="width: 30%" />
+                        <col style="width: 70%" />
                       </colgroup>
                       <thead hlmTHead>
                         <tr hlmTr>
+                          <th
+                            hlmTh
+                            class="fk-auth-th fk-auth-cell fk-fs-select-col text-center"
+                          >
+                            <input
+                              type="checkbox"
+                              class="fk-fs-row-select"
+                              [checked]="allPageMarkedForDelete()"
+                              [disabled]="!documents().length"
+                              [attr.aria-label]="
+                                allPageMarkedForDelete()
+                                  ? 'Clear delete marks on this page'
+                                  : 'Mark all documents on this page for delete'
+                              "
+                              (change)="toggleMarkAllOnPageForDelete()"
+                            />
+                          </th>
                           <th hlmTh class="fk-auth-th fk-auth-cell">
                             Document ID
                           </th>
@@ -530,8 +585,9 @@ const SKELETON_DOC_ROWS = 80;
                   >
                     <table hlmTable class="fk-auth-table">
                       <colgroup>
-                        <col style="width: 32%" />
-                        <col style="width: 68%" />
+                        <col style="width: 44px" />
+                        <col style="width: 30%" />
+                        <col style="width: 70%" />
                       </colgroup>
                       <tbody hlmTBody>
                         @for (doc of documents(); track doc.id) {
@@ -541,8 +597,26 @@ const SKELETON_DOC_ROWS = 80;
                             [class.fk-auth-row-selected]="
                               highlightedDocId() === doc.id
                             "
+                            [class.fk-fs-row-marked-delete]="
+                              isMarkedForDelete(doc.path)
+                            "
                             (click)="openDocument(doc.path)"
                           >
+                            <td
+                              hlmTd
+                              class="fk-auth-cell fk-fs-select-col text-center"
+                              (click)="$event.stopPropagation()"
+                            >
+                              <input
+                                type="checkbox"
+                                class="fk-fs-row-select"
+                                [checked]="isMarkedForDelete(doc.path)"
+                                [attr.aria-label]="
+                                  'Mark ' + doc.id + ' for delete'
+                                "
+                                (change)="toggleMarkForDelete(doc.path)"
+                              />
+                            </td>
                             <td
                               hlmTd
                               class="fk-auth-cell font-mono text-xs font-medium"
@@ -678,6 +752,16 @@ const SKELETON_DOC_ROWS = 80;
                 }
               </div>
             </section>
+
+            <fk-delete-confirm-dialog
+              [open]="confirmBulkDelete()"
+              [title]="bulkDeleteTitle()"
+              [message]="bulkDeleteMessage()"
+              [confirmLabel]="bulkDeleteConfirmLabel()"
+              [busy]="deletingBulk()"
+              (confirm)="confirmBulkDeleteDocuments()"
+              (cancel)="cancelBulkDeleteDialog()"
+            />
           </div>
         </div>
       }
@@ -707,6 +791,9 @@ export class FirestoreCollectionComponent implements OnInit, OnDestroy {
     syncing: boolean;
   } | null>(null);
   readonly viewMode = signal<DocumentViewMode>("fields");
+  readonly markedForDelete = signal<ReadonlySet<string>>(new Set());
+  readonly confirmBulkDelete = signal(false);
+  readonly deletingBulk = signal(false);
 
   readonly highlightedDocId = computed(() => {
     const path = this.nav.documentPath();
@@ -758,6 +845,26 @@ export class FirestoreCollectionComponent implements OnInit, OnDestroy {
       !!this.nav.collectionPath(),
   );
   readonly fieldColumns = computed(() => extractFieldColumns(this.documents()));
+  readonly markedCount = computed(() => this.markedForDelete().size);
+  readonly allPageMarkedForDelete = computed(() => {
+    const docs = this.documents();
+    return (
+      docs.length > 0 && docs.every((d) => this.markedForDelete().has(d.path))
+    );
+  });
+  readonly bulkDeleteTitle = computed(() =>
+    this.markedCount() === 1
+      ? "Delete document?"
+      : `Delete ${this.markedCount()} documents?`,
+  );
+  readonly bulkDeleteMessage = computed(() =>
+    this.markedCount() === 1
+      ? "This will permanently remove the document from Firestore. This action cannot be undone."
+      : `This will permanently remove ${this.markedCount()} documents from Firestore. This action cannot be undone.`,
+  );
+  readonly bulkDeleteConfirmLabel = computed(() =>
+    this.markedCount() === 1 ? "Delete document" : "Delete documents",
+  );
 
   private progressUnsub: (() => void) | null = null;
   private lastSyncedCollectionPath = "";
@@ -771,6 +878,7 @@ export class FirestoreCollectionComponent implements OnInit, OnDestroy {
       this.lastSyncedCollectionPath = path;
       this.exitIndexSearchMode();
       this.resetPagination();
+      this.clearMarkedForDelete();
       if (path) {
         void this.reload();
         void this.refreshIndexStatus();
@@ -778,6 +886,11 @@ export class FirestoreCollectionComponent implements OnInit, OnDestroy {
         this.documents.set([]);
         this.indexStatus.set(null);
       }
+    });
+
+    effect(() => {
+      this.pageIndex();
+      this.clearMarkedForDelete();
     });
   }
 
@@ -798,6 +911,76 @@ export class FirestoreCollectionComponent implements OnInit, OnDestroy {
 
   setViewMode(mode: DocumentViewMode): void {
     this.viewMode.set(mode);
+  }
+
+  isMarkedForDelete(path: string): boolean {
+    return this.markedForDelete().has(path);
+  }
+
+  toggleMarkForDelete(path: string): void {
+    this.markedForDelete.update((current) => {
+      const next = new Set(current);
+      if (next.has(path)) next.delete(path);
+      else next.add(path);
+      return next;
+    });
+  }
+
+  markAllOnPageForDelete(): void {
+    const paths = this.documents().map((d) => d.path);
+    if (!paths.length) return;
+    this.markedForDelete.set(new Set(paths));
+  }
+
+  toggleMarkAllOnPageForDelete(): void {
+    if (this.allPageMarkedForDelete()) {
+      const pagePaths = new Set(this.documents().map((d) => d.path));
+      this.markedForDelete.update((current) => {
+        const next = new Set(current);
+        for (const path of pagePaths) next.delete(path);
+        return next;
+      });
+      return;
+    }
+    this.markAllOnPageForDelete();
+  }
+
+  clearMarkedForDelete(): void {
+    this.markedForDelete.set(new Set());
+  }
+
+  openBulkDeleteDialog(): void {
+    if (this.markedCount() === 0) return;
+    this.confirmBulkDelete.set(true);
+  }
+
+  cancelBulkDeleteDialog(): void {
+    this.confirmBulkDelete.set(false);
+  }
+
+  async confirmBulkDeleteDocuments(): Promise<void> {
+    const projectId = this.activeId();
+    const paths = [...this.markedForDelete()];
+    if (!projectId || !paths.length) return;
+
+    this.deletingBulk.set(true);
+    this.error.set(null);
+    try {
+      for (const documentPath of paths) {
+        await this.electron.api.firestore.delete({ projectId, documentPath });
+      }
+      this.cancelBulkDeleteDialog();
+      this.clearMarkedForDelete();
+      if (this.indexSearchActive()) {
+        await this.runSearch();
+      } else {
+        await this.reload();
+      }
+    } catch (e) {
+      this.error.set(e instanceof Error ? e.message : String(e));
+    } finally {
+      this.deletingBulk.set(false);
+    }
   }
 
   openDocument(path: string, isNew = false): void {
