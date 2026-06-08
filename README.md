@@ -81,12 +81,13 @@ export GH_TOKEN="ghp_..."   # PAT with repo + contents access
 pnpm run dist:release
 ```
 
-Code signing is not configured in v1; see [docs/PROJECT.md](docs/PROJECT.md) roadmap.
+**macOS signing & notarization:** configure [GitHub Actions secrets](docs/SIGNING.md) (`CSC_LINK`, `CSC_KEY_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`) for signed release DMGs. Local builds use your Keychain Developer ID cert when present.
 
 ## Documentation
 
 - [Project overview & features](docs/PROJECT.md)
 - [Architecture & IPC](docs/ARCHITECTURE.md)
+- [macOS code signing](docs/SIGNING.md)
 - [Contributing](CONTRIBUTING.md)
 
 ## License

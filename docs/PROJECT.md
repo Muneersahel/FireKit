@@ -48,7 +48,7 @@ It optimizes for **large collections** through explicit cursor pagination, struc
 - Custom claims editor, provider linking, CSV import/export
 - Optional real-time watch on a single document
 - Security rules viewer (read-only)
-- macOS/Windows code signing and notarization for releases
+- macOS code signing and notarization for releases ([SIGNING.md](SIGNING.md); Windows signing still TBD)
 
 ## Non-goals
 
